@@ -29,6 +29,9 @@ class CustomSearchBar extends StatelessWidget {
           fit: BoxFit.scaleDown,
         ),
       ),
+      style: const TextStyle(
+        color: Colors.white,
+      ),
     );
   }
 }

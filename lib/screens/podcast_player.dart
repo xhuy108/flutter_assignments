@@ -1,4 +1,5 @@
 import 'package:bai3/models/podcast_episode.dart';
+import 'package:bai3/widgets/custom_bottom_navigation_bar.dart';
 import 'package:bai3/widgets/custom_navigation_bar.dart';
 import 'package:bai3/widgets/podcast_episode_item.dart';
 import 'package:flutter/material.dart';
@@ -7,9 +8,14 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../data/podcast_episodes_data.dart';
 
 class PodcastPlayerScreen extends StatefulWidget {
-  const PodcastPlayerScreen({super.key, required this.podcastEpisode});
+  const PodcastPlayerScreen({
+    super.key,
+    required this.podcastEpisode,
+    this.onLikePodcastEpisode,
+  });
 
   final PodcastEpisode podcastEpisode;
+  final void Function()? onLikePodcastEpisode;
 
   @override
   State<PodcastPlayerScreen> createState() => _PodcastPlayerScreenState();
@@ -18,6 +24,7 @@ class PodcastPlayerScreen extends StatefulWidget {
 class _PodcastPlayerScreenState extends State<PodcastPlayerScreen> {
   late List<PodcastEpisode> favoritePodcastEpisodes;
   double listeningDuration = 0;
+  int selectedTab = 0;
 
   @override
   void initState() {
@@ -61,58 +68,65 @@ class _PodcastPlayerScreenState extends State<PodcastPlayerScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: const CustomNavigationBar(),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: 48,
-                  right: 48,
-                  top: 24,
-                ),
-                child: Stack(
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      height: 280,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        image: DecorationImage(
-                          image: AssetImage(widget.podcastEpisode.image),
-                          fit: BoxFit.cover,
-                        ),
+      bottomNavigationBar: CustomBottomNavigationBar(
+        selectedTab: selectedTab,
+        onTap: (index) {
+          setState(() {
+            selectedTab = index;
+          });
+        },
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(
+                left: 64,
+                right: 64,
+                top: 24,
+              ),
+              child: Stack(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: 280,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      image: DecorationImage(
+                        image: AssetImage(widget.podcastEpisode.image),
+                        fit: BoxFit.cover,
                       ),
                     ),
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      child: IconButton(
-                        onPressed: () {},
-                        icon: SvgPicture.asset('assets/icons/heart.svg'),
-                      ),
+                  ),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: IconButton(
+                      onPressed: widget.onLikePodcastEpisode,
+                      icon: SvgPicture.asset('assets/icons/heart.svg'),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              const SizedBox(
-                height: 32,
+            ),
+            const SizedBox(
+              height: 32,
+            ),
+            Text(
+              widget.podcastEpisode.title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
               ),
-              Text(
-                widget.podcastEpisode.title,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(
-                height: 32,
-              ),
-              Row(
+            ),
+            const SizedBox(
+              height: 32,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
@@ -147,10 +161,13 @@ class _PodcastPlayerScreenState extends State<PodcastPlayerScreen> {
                   ),
                 ],
               ),
-              const SizedBox(
-                height: 24,
-              ),
-              SliderTheme(
+            ),
+            const SizedBox(
+              height: 24,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              child: SliderTheme(
                 data: SliderThemeData(
                   overlayShape: SliderComponentShape.noThumb,
                 ),
@@ -165,10 +182,13 @@ class _PodcastPlayerScreenState extends State<PodcastPlayerScreen> {
                   },
                 ),
               ),
-              const SizedBox(
-                height: 8,
-              ),
-              Row(
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
                 children: [
                   Text(
                     '00:00',
@@ -189,10 +209,13 @@ class _PodcastPlayerScreenState extends State<PodcastPlayerScreen> {
                   ),
                 ],
               ),
-              const SizedBox(
-                height: 16,
-              ),
-              const Row(
+            ),
+            const SizedBox(
+              height: 16,
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12.0),
+              child: Row(
                 children: [
                   Text(
                     'Favorite Podcast Episodes',
@@ -213,19 +236,30 @@ class _PodcastPlayerScreenState extends State<PodcastPlayerScreen> {
                   ),
                 ],
               ),
-              const SizedBox(
-                height: 16,
+            ),
+            const SizedBox(
+              height: 16,
+            ),
+            ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: favoritePodcastEpisodes.length,
+              itemBuilder: (ctx, index) => PodcastEpisodeItem(
+                podcastEpisode: favoritePodcastEpisodes[index],
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PodcastPlayerScreen(
+                        podcastEpisode: podcastEpisodes[index],
+                        onLikePodcastEpisode: widget.onLikePodcastEpisode,
+                      ),
+                    ),
+                  );
+                },
               ),
-              ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: favoritePodcastEpisodes.length,
-                itemBuilder: (ctx, index) => PodcastEpisodeItem(
-                  podcastEpisode: favoritePodcastEpisodes[index],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

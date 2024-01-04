@@ -23,11 +23,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int selectedTab = 0;
-  List<PodcastEpisode> favoritePodcastEpisodes = [];
-
-  void likePodcastHandler(PodcastEpisode podcastEpisode) {
-    favoritePodcastEpisodes.add(podcastEpisode);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -173,10 +168,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       MaterialPageRoute(
                         builder: (context) => PodcastPlayerScreen(
                           podcastEpisode: podcastEpisodes[index],
-                          onLikePodcastEpisode: () {
-                            likePodcastHandler(podcastEpisodes[index]);
-                            print(favoritePodcastEpisodes.length);
-                          },
                         ),
                       ),
                     );

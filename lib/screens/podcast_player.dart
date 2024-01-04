@@ -1,8 +1,9 @@
+import 'package:bai3/cubit/favorite_episode_cubit.dart';
 import 'package:bai3/models/podcast_episode.dart';
 import 'package:bai3/widgets/custom_bottom_navigation_bar.dart';
-import 'package:bai3/widgets/custom_navigation_bar.dart';
 import 'package:bai3/widgets/podcast_episode_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../data/podcast_episodes_data.dart';
@@ -11,11 +12,9 @@ class PodcastPlayerScreen extends StatefulWidget {
   const PodcastPlayerScreen({
     super.key,
     required this.podcastEpisode,
-    this.onLikePodcastEpisode,
   });
 
   final PodcastEpisode podcastEpisode;
-  final void Function()? onLikePodcastEpisode;
 
   @override
   State<PodcastPlayerScreen> createState() => _PodcastPlayerScreenState();
@@ -36,6 +35,10 @@ class _PodcastPlayerScreenState extends State<PodcastPlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isLiked = context.watch<FavoriteEpisodeCubit>().state.contains(
+          widget.podcastEpisode,
+        );
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -102,8 +105,17 @@ class _PodcastPlayerScreenState extends State<PodcastPlayerScreen> {
                     top: 0,
                     right: 0,
                     child: IconButton(
-                      onPressed: widget.onLikePodcastEpisode,
-                      icon: SvgPicture.asset('assets/icons/heart.svg'),
+                      onPressed: () {
+                        context
+                            .read<FavoriteEpisodeCubit>()
+                            .favoritePodcastHandler(widget.podcastEpisode);
+                      },
+                      icon: isLiked
+                          ? const Icon(
+                              Icons.favorite,
+                              color: Colors.white,
+                            )
+                          : SvgPicture.asset('assets/icons/heart.svg'),
                     ),
                   ),
                 ],
@@ -252,7 +264,6 @@ class _PodcastPlayerScreenState extends State<PodcastPlayerScreen> {
                     MaterialPageRoute(
                       builder: (context) => PodcastPlayerScreen(
                         podcastEpisode: podcastEpisodes[index],
-                        onLikePodcastEpisode: widget.onLikePodcastEpisode,
                       ),
                     ),
                   );

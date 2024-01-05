@@ -23,6 +23,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int selectedTab = 0;
+  int categoriedListHeight = 160;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      selectedTab = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,22 +55,17 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: CustomBottomNavigationBar(
         selectedTab: selectedTab,
-        onTap: (index) {
-          setState(() {
-            selectedTab = index;
-          });
-        },
+        onTap: _onItemTapped,
       ),
       body: Padding(
         padding: const EdgeInsets.only(
           top: 24.0,
         ),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12.0),
+        child: CustomScrollView(
+          slivers: [
+            const SliverPadding(
+              padding: EdgeInsets.symmetric(horizontal: 12.0),
+              sliver: SliverToBoxAdapter(
                 child: Text(
                   'Looking for podcast channels',
                   style: TextStyle(
@@ -73,17 +75,23 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12.0),
+            ),
+            const SliverToBoxAdapter(
+              child: SizedBox(height: 8),
+            ),
+            const SliverPadding(
+              padding: EdgeInsets.symmetric(horizontal: 12.0),
+              sliver: SliverToBoxAdapter(
                 child: CustomSearchBar(),
               ),
-              const SizedBox(height: 16),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12.0),
+            ),
+            SliverPadding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4),
+              sliver: SliverToBoxAdapter(
                 child: Row(
                   children: [
-                    Text(
+                    const Text(
                       'Categories',
                       style: TextStyle(
                         color: Colors.white,
@@ -91,15 +99,22 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontSize: 17,
                       ),
                     ),
-                    SizedBox(
-                      width: 8,
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          categoriedListHeight =
+                              categoriedListHeight == 0 ? 160 : 0;
+                        });
+                      },
+                      icon: Icon(
+                        categoriedListHeight == 0
+                            ? Icons.keyboard_arrow_down_rounded
+                            : Icons.keyboard_arrow_up_rounded,
+                        color: Colors.white,
+                      ),
                     ),
-                    Icon(
-                      Icons.keyboard_arrow_down_rounded,
-                      color: Colors.white,
-                    ),
-                    Spacer(),
-                    Text(
+                    const Spacer(),
+                    const Text(
                       'View all',
                       style: TextStyle(
                         color: Colors.white,
@@ -110,27 +125,29 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 16,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 12.0),
-                child: SizedBox(
-                  height: 120,
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              sliver: SliverToBoxAdapter(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  height: categoriedListHeight.toDouble(),
                   child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
                     itemCount: categories.length,
+                    scrollDirection: Axis.horizontal,
                     itemBuilder: (ctx, index) => CategoryItem(
                       category: categories[index],
                     ),
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 32,
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12.0),
+            ),
+            const SliverToBoxAdapter(
+              child: SizedBox(height: 32),
+            ),
+            const SliverPadding(
+              padding: EdgeInsets.symmetric(horizontal: 12.0),
+              sliver: SliverToBoxAdapter(
                 child: Row(
                   children: [
                     Text(
@@ -153,29 +170,27 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 16,
-              ),
-              ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: podcastEpisodes.length,
-                itemBuilder: (ctx, index) => PodcastEpisodeItem(
-                  podcastEpisode: podcastEpisodes[index],
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PodcastPlayerScreen(
-                          podcastEpisode: podcastEpisodes[index],
-                        ),
+            ),
+            const SliverToBoxAdapter(
+              child: SizedBox(height: 16),
+            ),
+            SliverList.builder(
+              itemCount: podcastEpisodes.length,
+              itemBuilder: (ctx, index) => PodcastEpisodeItem(
+                podcastEpisode: podcastEpisodes[index],
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PodcastPlayerScreen(
+                        podcastEpisode: podcastEpisodes[index],
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

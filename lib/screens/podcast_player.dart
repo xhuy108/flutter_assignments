@@ -5,8 +5,15 @@ import 'package:bai3/widgets/podcast_episode_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 import '../data/podcast_episodes_data.dart';
+
+String formatDuration(Duration duration) {
+  String minutes = (duration.inMinutes % 60).toString().padLeft(2, '0');
+  String seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
+  return '$minutes:$seconds';
+}
 
 class PodcastPlayerScreen extends StatefulWidget {
   const PodcastPlayerScreen({
@@ -21,9 +28,13 @@ class PodcastPlayerScreen extends StatefulWidget {
 }
 
 class _PodcastPlayerScreenState extends State<PodcastPlayerScreen> {
-  late List<PodcastEpisode> favoritePodcastEpisodes;
-  double listeningDuration = 0;
   int selectedTab = 0;
+  late List<PodcastEpisode> favoritePodcastEpisodes;
+  final _audioPlayer = AudioPlayer();
+
+  Duration _currentPosition = Duration.zero;
+  Duration _duration = Duration.zero;
+  bool isPlaying = true;
 
   @override
   void initState() {
@@ -31,6 +42,28 @@ class _PodcastPlayerScreenState extends State<PodcastPlayerScreen> {
     favoritePodcastEpisodes = podcastEpisodes
         .where((episode) => episode.title != widget.podcastEpisode.title)
         .toList();
+
+    _audioPlayer.onPositionChanged.listen((Duration duration) {
+      setState(() {
+        _currentPosition = duration;
+      });
+    });
+
+    _audioPlayer.onDurationChanged.listen((Duration duration) {
+      setState(() {
+        _duration = duration;
+      });
+    });
+
+    _audioPlayer.play(
+      AssetSource('audios/KhongTheSay-HIEUTHUHAI-9293024.mp3'),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _audioPlayer.dispose();
   }
 
   @override
@@ -154,7 +187,12 @@ class _PodcastPlayerScreenState extends State<PodcastPlayerScreen> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      isPlaying
+                          ? await _audioPlayer.pause()
+                          : await _audioPlayer.resume();
+                      isPlaying = !isPlaying;
+                    },
                     icon: SvgPicture.asset(
                       'assets/icons/play.svg',
                     ),
@@ -184,12 +222,14 @@ class _PodcastPlayerScreenState extends State<PodcastPlayerScreen> {
                   overlayShape: SliderComponentShape.noThumb,
                 ),
                 child: Slider(
-                  value: listeningDuration,
+                  value: _currentPosition.inSeconds.toDouble(),
+                  min: 0.0,
+                  max: _duration.inSeconds.toDouble(),
                   activeColor: const Color(0xFFFF3D71),
                   inactiveColor: Colors.white.withOpacity(0.3),
                   onChanged: (value) {
                     setState(() {
-                      listeningDuration = value;
+                      _audioPlayer.seek(Duration(seconds: value.toInt()));
                     });
                   },
                 ),
@@ -203,7 +243,7 @@ class _PodcastPlayerScreenState extends State<PodcastPlayerScreen> {
               child: Row(
                 children: [
                   Text(
-                    '00:00',
+                    formatDuration(_currentPosition),
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.6),
                       fontSize: 12,
@@ -212,7 +252,7 @@ class _PodcastPlayerScreenState extends State<PodcastPlayerScreen> {
                   ),
                   const Spacer(),
                   Text(
-                    '03:05',
+                    formatDuration(_duration),
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.6),
                       fontSize: 12,

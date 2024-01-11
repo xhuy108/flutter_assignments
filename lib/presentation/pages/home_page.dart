@@ -1,4 +1,5 @@
 import 'package:bai5/presentation/cubit/news_cubit.dart';
+import 'package:bai5/presentation/widgets/loader.dart';
 import 'package:bai5/presentation/widgets/news_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,6 +15,34 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final ScrollController _scrollController = ScrollController();
+  int page = 1;
+
+  void _onScroll() {
+    if (_isBottom) {
+      context.read<NewsCubit>().fetchNews(page);
+    }
+  }
+
+  bool get _isBottom {
+    if (!_scrollController.hasClients) return false;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    return currentScroll == maxScroll;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,9 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: BlocBuilder<NewsCubit, NewsState>(
                 builder: (context, state) {
                   if (state.status == NewsStatus.loading) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
+                    return const Loader();
                   }
                   if (state.status == NewsStatus.failure) {
                     return const Center(
@@ -82,11 +109,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
                   return ListView.builder(
                     controller: _scrollController,
-                    itemCount: state.news.length,
+                    itemCount: state.hasReachedMax
+                        ? state.news.length
+                        : state.news.length + 1,
                     itemBuilder: (context, index) {
-                      return NewsItem(
-                        news: state.news[index],
-                      );
+                      if (index >= state.news.length) {
+                        page++;
+                        return const Loader();
+                      } else {
+                        return NewsItem(
+                          news: state.news[index],
+                        );
+                      }
                     },
                   );
                 },

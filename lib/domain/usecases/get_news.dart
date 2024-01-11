@@ -10,7 +10,7 @@ class GetNews implements UseCaseWithoutParams<List<News>> {
   const GetNews(this.repository);
 
   @override
-  Future<Either<Failure, List<News>>> call() async {
-    return await repository.getNews();
+  Future<Either<Failure, List<News>>> call([int page = 1]) async {
+    return await repository.getNews(page);
   }
 }

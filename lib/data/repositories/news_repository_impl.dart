@@ -13,9 +13,9 @@ class NewsRepositoryImpl implements NewsRepository {
   });
 
   @override
-  Future<Either<Failure, List<NewsModel>>> getNews() async {
+  Future<Either<Failure, List<NewsModel>>> getNews(int page) async {
     try {
-      final remoteNews = await remoteDataSource.getNews();
+      final remoteNews = await remoteDataSource.getNews(page);
 
       return Right(remoteNews);
     } on ServerException catch (e) {

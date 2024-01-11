@@ -10,17 +10,30 @@ class NewsCubit extends Cubit<NewsState> {
 
   NewsCubit({required this.getNews}) : super(const NewsState());
 
-  void fetchNews() async {
-    emit(state.copyWith(status: NewsStatus.loading));
-    final news = await getNews();
-    news.fold(
-      (failure) => emit(state.copyWith(status: NewsStatus.failure)),
-      (news) => emit(
-        state.copyWith(
-          status: NewsStatus.success,
-          news: news,
-        ),
-      ),
-    );
+  void fetchNews(int page) async {
+    if (state.hasReachedMax) return;
+    if (page == 1) emit(state.copyWith(status: NewsStatus.loading));
+    final news = await getNews(page);
+
+    news.fold((failure) => emit(state.copyWith(status: NewsStatus.failure)),
+        (news) {
+      if (news.isEmpty) {
+        emit(state.copyWith(hasReachedMax: true));
+      } else {
+        if (page == 1) {
+          emit(state.copyWith(
+            status: NewsStatus.success,
+            news: news,
+            hasReachedMax: false,
+          ));
+        } else {
+          emit(state.copyWith(
+            status: NewsStatus.success,
+            news: List.of(state.news)..addAll(news),
+            hasReachedMax: false,
+          ));
+        }
+      }
+    });
   }
 }

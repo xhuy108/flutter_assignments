@@ -1,3 +1,4 @@
+import 'package:bai5/core/network/network_info.dart';
 import 'package:bai5/data/datasources/news_remote_datasource.dart';
 import 'package:bai5/data/repositories/news_repository_impl.dart';
 import 'package:bai5/domain/repositories/news_repository.dart';
@@ -5,10 +6,12 @@ import 'package:bai5/domain/usecases/get_news.dart';
 import 'package:bai5/presentation/cubit/news_cubit.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 final sl = GetIt.instance;
 
 Future<void> init() async {
+  //! Features - News
   //Bloc
   sl.registerFactory(
     () => NewsCubit(
@@ -23,6 +26,7 @@ Future<void> init() async {
   sl.registerLazySingleton<NewsRepository>(
     () => NewsRepositoryImpl(
       remoteDataSource: sl(),
+      networkInfo: sl(),
     ),
   );
 
@@ -31,10 +35,14 @@ Future<void> init() async {
     () => NewsRemoteDataSourceImpl(client: sl()),
   );
 
-  // //Core
-  // sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
+  //! Core
+  sl.registerLazySingleton<NetworkInfo>(
+    () => NetworkInfoImpl(
+      connectionChecker: sl(),
+    ),
+  );
 
   //! External
   sl.registerLazySingleton(() => Dio());
-  // sl.registerLazySingleton(() => DataConnectionChecker());
+  sl.registerLazySingleton(() => InternetConnectionChecker());
 }

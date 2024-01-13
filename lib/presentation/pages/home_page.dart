@@ -102,8 +102,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     return const Loader();
                   }
                   if (state.status == NewsStatus.failure) {
-                    return const Center(
-                      child: Text('Something went wrong!'),
+                    return Center(
+                      child: Text(state.error),
                     );
                   }
 

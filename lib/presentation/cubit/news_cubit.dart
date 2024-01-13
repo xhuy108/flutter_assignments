@@ -15,8 +15,13 @@ class NewsCubit extends Cubit<NewsState> {
     if (page == 1) emit(state.copyWith(status: NewsStatus.loading));
     final news = await getNews(page);
 
-    news.fold((failure) => emit(state.copyWith(status: NewsStatus.failure)),
-        (news) {
+    news.fold(
+        (failure) => emit(
+              state.copyWith(
+                status: NewsStatus.failure,
+                error: failure.message,
+              ),
+            ), (news) {
       if (news.isEmpty) {
         emit(state.copyWith(hasReachedMax: true));
       } else {

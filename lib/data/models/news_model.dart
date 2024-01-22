@@ -9,6 +9,16 @@ class NewsModel extends News {
     required super.image,
   });
 
+  factory NewsModel.fromEntity(News news) {
+    return NewsModel(
+      id: news.id,
+      title: news.title,
+      summary: news.summary,
+      modifiedAt: news.modifiedAt,
+      image: news.image,
+    );
+  }
+
   factory NewsModel.fromJson(Map<String, dynamic> json) {
     return NewsModel(
       id: json['storyId'] as int,

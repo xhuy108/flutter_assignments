@@ -1,3 +1,4 @@
+import 'package:bai5/core/utils/injection_container.dart';
 import 'package:bai5/presentation/cubit/news_cubit.dart';
 import 'package:bai5/presentation/widgets/loader.dart';
 import 'package:bai5/presentation/widgets/news_item.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:bai5/domain/entities/news.dart';
 import 'package:bai5/domain/usecases/cache_first_time.dart';
 import 'package:bai5/domain/usecases/cache_news.dart';
@@ -29,8 +27,12 @@ class NewsCubit extends Cubit<NewsState> {
     required this.clearCache,
   }) : super(const NewsState());
 
-  void fetchNews(int page) async {
-    if (state.hasReachedMax) return;
+  // Stream<void> fetchNews(int page) {
+  //   return Stream.fromFuture(_fetchNews(page));
+  // }
+
+  Future<void> fetchNews(int page) async {
+    if (state.hasReachedMax || state.isLoadingMore) return;
     final isFirstTime = sharedPreferences.getBool('firstTime');
     if (isFirstTime == null || isFirstTime) {
       if (page == 1) emit(state.copyWith(status: NewsStatus.loading));
@@ -77,7 +79,10 @@ class NewsCubit extends Cubit<NewsState> {
   }
 
   void fetchRemoteNews(int page) async {
+    print(page);
     final isFirstTime = sharedPreferences.getBool('firstTime');
+    emit(state.copyWith(isLoadingMore: true));
+
     final remoteNews = await getRemoteNews(page);
     print(remoteNews);
 
@@ -91,7 +96,10 @@ class NewsCubit extends Cubit<NewsState> {
         );
       } else {
         emit(
-          state.copyWith(hasReachedMax: true),
+          state.copyWith(
+            hasReachedMax: true,
+            isLoadingMore: false,
+          ),
         );
       }
     }, (news) {
@@ -103,6 +111,7 @@ class NewsCubit extends Cubit<NewsState> {
             status: NewsStatus.success,
             news: news,
             hasReachedMax: false,
+            isLoadingMore: false,
           ));
           clearCache();
         } else {
@@ -110,6 +119,7 @@ class NewsCubit extends Cubit<NewsState> {
             status: NewsStatus.success,
             news: [...state.news, ...news],
             hasReachedMax: false,
+            isLoadingMore: false,
           ));
         }
         cachingNews(news);

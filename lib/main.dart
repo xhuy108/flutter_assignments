@@ -1,3 +1,4 @@
+import 'package:bai5/presentation/bloc/news_bloc.dart';
 import 'package:bai5/presentation/cubit/news_cubit.dart';
 import 'package:bai5/presentation/pages/home_page.dart';
 import 'package:bai5/core/utils/injection_container.dart';

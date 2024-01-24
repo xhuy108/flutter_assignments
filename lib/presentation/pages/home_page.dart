@@ -1,4 +1,4 @@
-import 'package:bai5/core/utils/injection_container.dart';
+// import 'package:bai5/presentation/bloc/news_bloc.dart';
 import 'package:bai5/presentation/cubit/news_cubit.dart';
 import 'package:bai5/presentation/widgets/loader.dart';
 import 'package:bai5/presentation/widgets/news_item.dart';
@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stream_transform/stream_transform.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -19,9 +19,26 @@ class _MyHomePageState extends State<MyHomePage> {
   final ScrollController _scrollController = ScrollController();
   int page = 1;
 
-  void _onScroll() {
-    if (_isBottom) {
+  Stream<void> printPage(int page) {
+    return Stream.fromFuture(_print(page));
+  }
+
+  Future<void> _print(int page) {
+    return Future.delayed(const Duration(seconds: 5), () {
       context.read<NewsCubit>().fetchNews(page);
+    });
+  }
+
+  void _onScroll() {
+    final state = context.read<NewsCubit>().state;
+    print(state.isLoadingMore);
+    if (_isBottom && !state.isLoadingMore) {
+      print(page);
+      page++;
+
+      context.read<NewsCubit>().fetchNews(page);
+
+      // context.read<NewsCubit>().fetchNews(page);
     }
   }
 
@@ -116,7 +133,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         : state.news.length + 1,
                     itemBuilder: (context, index) {
                       if (index >= state.news.length) {
-                        page++;
                         return const Loader();
                       } else {
                         return NewsItem(

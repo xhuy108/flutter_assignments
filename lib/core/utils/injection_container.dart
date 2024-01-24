@@ -9,7 +9,6 @@ import 'package:bai5/domain/usecases/cache_news.dart';
 import 'package:bai5/domain/usecases/clear_cache.dart';
 import 'package:bai5/domain/usecases/get_local_news.dart';
 import 'package:bai5/domain/usecases/get_remote_news.dart';
-import 'package:bai5/presentation/bloc/news_bloc.dart';
 
 import 'package:bai5/presentation/cubit/news_cubit.dart';
 import 'package:dio/dio.dart';
@@ -25,18 +24,6 @@ Future<void> init() async {
   //Cubit
   sl.registerFactory(
     () => NewsCubit(
-      getRemoteNews: sl(),
-      getLocalNews: sl(),
-      cacheNews: sl(),
-      cacheFirstTime: sl(),
-      sharedPreferences: sl(),
-      clearCache: sl(),
-    ),
-  );
-
-  //Bloc
-  sl.registerFactory(
-    () => NewsBloc(
       getRemoteNews: sl(),
       getLocalNews: sl(),
       cacheNews: sl(),

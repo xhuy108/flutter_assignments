@@ -1,12 +1,14 @@
-import 'package:bai5/domain/entities/news.dart';
-import 'package:bai5/domain/usecases/cache_first_time.dart';
-import 'package:bai5/domain/usecases/cache_news.dart';
-import 'package:bai5/domain/usecases/clear_cache.dart';
-import 'package:bai5/domain/usecases/get_local_news.dart';
-import 'package:bai5/domain/usecases/get_remote_news.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:bai5/domain/entities/news.dart';
+
+import 'package:bai5/domain/usecases/cache_first_time.dart';
+import 'package:bai5/domain/usecases/get_local_news.dart';
+import 'package:bai5/domain/usecases/get_remote_news.dart';
+import 'package:bai5/domain/usecases/cache_news.dart';
+import 'package:bai5/domain/usecases/clear_cache.dart';
 
 part 'news_state.dart';
 
@@ -26,10 +28,6 @@ class NewsCubit extends Cubit<NewsState> {
     required this.sharedPreferences,
     required this.clearCache,
   }) : super(const NewsState());
-
-  // Stream<void> fetchNews(int page) {
-  //   return Stream.fromFuture(_fetchNews(page));
-  // }
 
   Future<void> fetchNews(int page) async {
     if (state.hasReachedMax || state.isLoadingMore) return;
@@ -79,12 +77,11 @@ class NewsCubit extends Cubit<NewsState> {
   }
 
   void fetchRemoteNews(int page) async {
-    print(page);
     final isFirstTime = sharedPreferences.getBool('firstTime');
     emit(state.copyWith(isLoadingMore: true));
 
     final remoteNews = await getRemoteNews(page);
-    print(remoteNews);
+    // print(remoteNews);
 
     remoteNews.fold((failure) {
       if (isFirstTime == null || isFirstTime) {

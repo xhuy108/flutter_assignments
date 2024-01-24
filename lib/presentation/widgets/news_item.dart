@@ -1,8 +1,9 @@
-import 'package:bai5/domain/entities/news.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+
+import 'package:bai5/domain/entities/news.dart';
 
 final formatter = DateFormat('MMM d, yyyy');
 String formattedDate = DateFormat('MMM d, yyyy')

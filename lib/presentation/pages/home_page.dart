@@ -1,12 +1,12 @@
-// import 'package:bai5/presentation/bloc/news_bloc.dart';
-import 'package:bai5/presentation/cubit/news_cubit.dart';
-import 'package:bai5/presentation/widgets/loader.dart';
-import 'package:bai5/presentation/widgets/news_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:stream_transform/stream_transform.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import 'package:bai5/presentation/widgets/loader.dart';
+import 'package:bai5/presentation/widgets/news_item.dart';
+
+import 'package:bai5/presentation/cubit/news_cubit.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -31,14 +31,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _onScroll() {
     final state = context.read<NewsCubit>().state;
-    print(state.isLoadingMore);
     if (_isBottom && !state.isLoadingMore) {
-      print(page);
       page++;
 
       context.read<NewsCubit>().fetchNews(page);
-
-      // context.read<NewsCubit>().fetchNews(page);
     }
   }
 

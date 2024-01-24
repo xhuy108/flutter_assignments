@@ -19,16 +19,6 @@ class _MyHomePageState extends State<MyHomePage> {
   final ScrollController _scrollController = ScrollController();
   int page = 1;
 
-  Stream<void> printPage(int page) {
-    return Stream.fromFuture(_print(page));
-  }
-
-  Future<void> _print(int page) {
-    return Future.delayed(const Duration(seconds: 5), () {
-      context.read<NewsCubit>().fetchNews(page);
-    });
-  }
-
   void _onScroll() {
     final state = context.read<NewsCubit>().state;
     if (_isBottom && !state.isLoadingMore) {

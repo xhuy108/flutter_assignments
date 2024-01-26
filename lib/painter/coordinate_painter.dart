@@ -25,38 +25,18 @@ class CoordinatePainter extends CustomPainter {
     final double centerX = (size.width / 2 + origin.dx) * scale;
     final double centerY = (size.height / 2 + origin.dy) * scale;
 
-    // Draw unit lines and numbers
     final textPainter = TextPainter(
       textDirection: TextDirection.ltr,
     );
 
-    // Draw X and Y axes
-    canvas.drawLine(
-      Offset(0, centerY),
-      Offset(size.width, centerY),
-      mainAxisPaint,
-    );
-    canvas.drawLine(
-      Offset(centerX, 0),
-      Offset(centerX, size.height),
-      mainAxisPaint,
-    );
-
-    textPainter.text = const TextSpan(
-      text: 'O',
-      style: TextStyle(
-        color: Colors.black,
-        fontWeight: FontWeight.bold,
-        fontSize: 16,
-      ),
-    );
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      Offset(
-        centerX - 16,
-        centerY + 5,
-      ),
+    // Draw main axis
+    drawMainAxis(
+      canvas: canvas,
+      size: size,
+      centerX: centerX,
+      centerY: centerY,
+      textPainter: textPainter,
+      mainAxisPaint: mainAxisPaint,
     );
 
     final subCoordinatePaint = Paint()
@@ -146,8 +126,8 @@ class CoordinatePainter extends CustomPainter {
     // Draw unit lines on Y axis
     for (double y = unit; y <= maxY; y += smallestSubdivision) {
       canvas.drawLine(
-        Offset(centerX - 5, centerY + y * 30 * scale),
-        Offset(centerX + 5, centerY + y * 30 * scale),
+        Offset(centerX - 5, centerY - y * 30 * scale),
+        Offset(centerX + 5, centerY - y * 30 * scale),
         subCoordinatePaint,
       );
 
@@ -155,13 +135,13 @@ class CoordinatePainter extends CustomPainter {
 
       if (y.toStringAsFixed(1) == y.roundToDouble().toString()) {
         canvas.drawLine(
-          Offset(0, centerY + y * 30 * scale),
-          Offset(size.width, centerY + y * 30 * scale),
+          Offset(0, centerY - y * 30 * scale),
+          Offset(size.width, centerY - y * 30 * scale),
           subCoordinatePaint,
         );
-        unitNum = (y * -1).round().toString();
+        unitNum = y.round().toString();
       } else {
-        unitNum = (y * -1).toStringAsFixed(1);
+        unitNum = y.toStringAsFixed(1);
       }
 
       textPainter.text = TextSpan(
@@ -173,7 +153,7 @@ class CoordinatePainter extends CustomPainter {
         canvas,
         Offset(
           centerX + 10,
-          centerY + y * 30 * scale - 9,
+          centerY - y * 30 * scale - 9,
         ),
       );
     }
@@ -181,21 +161,21 @@ class CoordinatePainter extends CustomPainter {
       if (y >= 0) continue;
 
       canvas.drawLine(
-        Offset(centerX - 5, centerY + y * 30 * scale),
-        Offset(centerX + 5, centerY + y * 30 * scale),
+        Offset(centerX - 5, centerY - y * 30 * scale),
+        Offset(centerX + 5, centerY - y * 30 * scale),
         subCoordinatePaint,
       );
       String unitNum = '';
 
       if (y.toStringAsFixed(1) == y.roundToDouble().toString()) {
         canvas.drawLine(
-          Offset(0, centerY + y * 30 * scale),
-          Offset(size.width, centerY + y * 30 * scale),
+          Offset(0, centerY - y * 30 * scale),
+          Offset(size.width, centerY - y * 30 * scale),
           subCoordinatePaint,
         );
-        unitNum = (y * -1).round().toString();
+        unitNum = y.round().toString();
       } else {
-        unitNum = (y * -1).toStringAsFixed(1);
+        unitNum = y.toStringAsFixed(1);
       }
 
       textPainter.text = TextSpan(
@@ -207,12 +187,95 @@ class CoordinatePainter extends CustomPainter {
         canvas,
         Offset(
           centerX + 10,
-          centerY + y * 30 * scale - 9,
+          centerY - y * 30 * scale - 9,
         ),
       );
     }
 
     // Draw shapes
+    drawShapes(canvas);
+  }
+
+  void drawMainAxis({
+    required Canvas canvas,
+    required Size size,
+    required double centerX,
+    required double centerY,
+    required TextPainter textPainter,
+    required Paint mainAxisPaint,
+  }) {
+    // Draw X and Y axes
+    canvas.drawLine(
+      Offset(0, centerY),
+      Offset(size.width, centerY),
+      mainAxisPaint,
+    );
+    canvas.drawLine(
+      Offset(centerX, 0),
+      Offset(centerX, size.height),
+      mainAxisPaint,
+    );
+
+    textPainter.text = const TextSpan(
+      text: 'O',
+      style: TextStyle(
+        color: Colors.black,
+        fontWeight: FontWeight.bold,
+        fontSize: 16,
+      ),
+    );
+    textPainter.layout();
+    textPainter.paint(
+      canvas,
+      Offset(
+        centerX - 16,
+        centerY + 5,
+      ),
+    );
+  }
+
+  void drawUnitLine({
+    required Canvas canvas,
+    required double value,
+    required TextPainter textPainter,
+    required Paint subCoordinatePaint,
+    required Offset textOffset,
+    required Offset miniSubLineStart,
+    required Offset miniSubLineEnd,
+    required Offset longSubLineStart,
+    required Offset longSubLineEnd,
+  }) {
+    canvas.drawLine(
+      miniSubLineStart,
+      miniSubLineEnd,
+      subCoordinatePaint,
+    );
+
+    String unitNum = '';
+
+    if (value.toStringAsFixed(1) == value.roundToDouble().toString()) {
+      canvas.drawLine(
+        longSubLineStart,
+        longSubLineEnd,
+        subCoordinatePaint,
+      );
+      unitNum = value.round().toString();
+    } else {
+      unitNum = value.toStringAsFixed(1);
+    }
+
+    textPainter.text = TextSpan(
+      text: unitNum,
+      style: const TextStyle(color: Colors.black),
+    );
+    textPainter.layout();
+    textPainter.paint(
+      canvas,
+      textOffset,
+    );
+  }
+
+  void drawShapes(Canvas canvas) {
     for (var shape in shapes) {
       final paint = Paint()..color = shape.color;
 

@@ -103,8 +103,8 @@ class _CoordinateSystemState extends State<CoordinateSystem> {
       shapes.add(
         Shape.rectangle(
           color: Colors.primaries[Random().nextInt(Colors.primaries.length)],
-          width: Random().nextDouble() * 100,
-          height: Random().nextDouble() * 100,
+          width: Random().nextDouble() * 300,
+          height: Random().nextDouble() * 300,
           offset: centerInCoordinateSystem,
         ),
       );
@@ -121,7 +121,7 @@ class _CoordinateSystemState extends State<CoordinateSystem> {
       shapes.add(
         Shape.circle(
           color: Colors.primaries[Random().nextInt(Colors.primaries.length)],
-          radius: Random().nextDouble() * 50,
+          radius: Random().nextDouble() * 150,
           offset: centerInCoordinateSystem,
         ),
       );

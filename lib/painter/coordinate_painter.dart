@@ -126,8 +126,8 @@ class CoordinatePainter extends CustomPainter {
     // Draw unit lines on Y axis
     for (double y = unit; y <= maxY; y += smallestSubdivision) {
       canvas.drawLine(
-        Offset(centerX - 5, centerY - y * 30 * scale),
-        Offset(centerX + 5, centerY - y * 30 * scale),
+        Offset(centerX - 5, centerY + y * 30 * scale),
+        Offset(centerX + 5, centerY + y * 30 * scale),
         subCoordinatePaint,
       );
 
@@ -135,13 +135,13 @@ class CoordinatePainter extends CustomPainter {
 
       if (y.toStringAsFixed(1) == y.roundToDouble().toString()) {
         canvas.drawLine(
-          Offset(0, centerY - y * 30 * scale),
-          Offset(size.width, centerY - y * 30 * scale),
+          Offset(0, centerY + y * 30 * scale),
+          Offset(size.width, centerY + y * 30 * scale),
           subCoordinatePaint,
         );
-        unitNum = y.round().toString();
+        unitNum = (y * -1).round().toString();
       } else {
-        unitNum = y.toStringAsFixed(1);
+        unitNum = (y * -1).toStringAsFixed(1);
       }
 
       textPainter.text = TextSpan(
@@ -153,7 +153,7 @@ class CoordinatePainter extends CustomPainter {
         canvas,
         Offset(
           centerX + 10,
-          centerY - y * 30 * scale - 9,
+          centerY + y * 30 * scale - 9,
         ),
       );
     }
@@ -161,21 +161,21 @@ class CoordinatePainter extends CustomPainter {
       if (y >= 0) continue;
 
       canvas.drawLine(
-        Offset(centerX - 5, centerY - y * 30 * scale),
-        Offset(centerX + 5, centerY - y * 30 * scale),
+        Offset(centerX - 5, centerY + y * 30 * scale),
+        Offset(centerX + 5, centerY + y * 30 * scale),
         subCoordinatePaint,
       );
       String unitNum = '';
 
       if (y.toStringAsFixed(1) == y.roundToDouble().toString()) {
         canvas.drawLine(
-          Offset(0, centerY - y * 30 * scale),
-          Offset(size.width, centerY - y * 30 * scale),
+          Offset(0, centerY + y * 30 * scale),
+          Offset(size.width, centerY + y * 30 * scale),
           subCoordinatePaint,
         );
-        unitNum = y.round().toString();
+        unitNum = (y * -1).round().toString();
       } else {
-        unitNum = y.toStringAsFixed(1);
+        unitNum = (y * -1).toStringAsFixed(1);
       }
 
       textPainter.text = TextSpan(
@@ -187,7 +187,7 @@ class CoordinatePainter extends CustomPainter {
         canvas,
         Offset(
           centerX + 10,
-          centerY - y * 30 * scale - 9,
+          centerY + y * 30 * scale - 9,
         ),
       );
     }

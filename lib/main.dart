@@ -103,8 +103,8 @@ class _CoordinateSystemState extends State<CoordinateSystem> {
       shapes.add(
         Shape.rectangle(
           color: Colors.primaries[Random().nextInt(Colors.primaries.length)],
-          width: Random().nextDouble() * 300,
-          height: Random().nextDouble() * 300,
+          width: Random().nextDouble() * 250,
+          height: Random().nextDouble() * 250,
           offset: centerInCoordinateSystem,
         ),
       );
@@ -179,7 +179,6 @@ class _CoordinateSystemState extends State<CoordinateSystem> {
 
         final positionInShapeCoordinates =
             (details.localPosition - newOrigin * scale) / scale;
-        print('after calculation');
 
         print('origin: $origin - scale: $scale');
 

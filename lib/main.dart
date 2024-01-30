@@ -95,10 +95,10 @@ class _CoordinateSystemState extends State<CoordinateSystem> {
   void addRectangle() {
     setState(() {
       final center = Offset(context.size!.width / 2, context.size!.height / 2);
-      final centerInCoordinateSystem = (center - origin * scale) / scale;
+      final centerInCoordinateSystem = (center - origin);
 
-      print('center: $center - origin: $origin - scale: $scale');
-      print(centerInCoordinateSystem);
+      // print('center: $center - origin: $origin - scale: $scale');
+      // print('centerInCoordinateSystem: $centerInCoordinateSystem');
 
       shapes.add(
         Shape.rectangle(
@@ -114,10 +114,11 @@ class _CoordinateSystemState extends State<CoordinateSystem> {
   void addCircle() {
     setState(() {
       final center = Offset(context.size!.width / 2, context.size!.height / 2);
-      final centerInCoordinateSystem = (center - origin * scale) / scale;
+      final centerInCoordinateSystem = (center - origin);
 
-      print('center: $center - origin: $origin - scale: $scale');
-      print(centerInCoordinateSystem);
+      // print('add circle');
+      // print('center: $center - origin: $origin - scale: $scale');
+      // print('centerInCoordinateSystem: $centerInCoordinateSystem');
       shapes.add(
         Shape.circle(
           color: Colors.primaries[Random().nextInt(Colors.primaries.length)],
@@ -129,11 +130,12 @@ class _CoordinateSystemState extends State<CoordinateSystem> {
   }
 
   void selectShape(Offset position) {
-    print('Shape selected at position: $position');
+    // print('Shape selected at position: $position');
     for (var shape in shapes.reversed) {
-      print('${shape.offset!}');
+      // print('${shape.offset!}');
       if (shape.contains(position)) {
-        print('Shape selected: ${shape.offset! - position}');
+        // print('${shape.offset!}');
+        // print('Shape selected: ${shape.offset! - position}');
         selectedShape = shape;
         break;
       }
@@ -141,8 +143,10 @@ class _CoordinateSystemState extends State<CoordinateSystem> {
   }
 
   void moveShape(Offset position) {
+    // print('Moving shape to position: $position');
+    // print(selectedShape);
     if (selectedShape != null) {
-      print('Moving shape to position: $position');
+      // print('Moving shape to position: $position');
       setState(() {
         // Remove the selected shape from the shapes list
         shapes.remove(selectedShape);
@@ -164,24 +168,40 @@ class _CoordinateSystemState extends State<CoordinateSystem> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onLongPressStart: (details) {
-        print('long press start');
-        final newOrigin = origin;
-        final positionInShapeCoordinates =
-            (details.localPosition - newOrigin * scale) / scale;
+        // print('long press start');
+
+        // print('newOrigin: $origin');
+        // print('details.localPosition: ${details.localPosition}');
+        // print('scale: $scale');
+        final center =
+            Offset(context.size!.width / 2, context.size!.height / 2) +
+                origin * scale;
+
+        final positionInShapeCoordinates = (details.localPosition / scale -
+            origin * scale -
+            center * (1 - scale) / scale);
+
+        // print('positionInShapeCoordinates: $positionInShapeCoordinates');
 
         selectShape(positionInShapeCoordinates);
       },
       onLongPressMoveUpdate: (details) {
-        print('long press move update');
+        // print('long press move update');
 
-        print('origin: $origin - scale: $scale');
-        final newOrigin = origin;
+        // print('origin: $origin - scale: $scale');
+        // print('details.localPosition: ${details.localPosition}');
+        // print('origin: $origin');
 
-        final positionInShapeCoordinates =
-            (details.localPosition - newOrigin * scale) / scale;
+        final center =
+            Offset(context.size!.width / 2, context.size!.height / 2) +
+                origin * scale;
 
-        print('origin: $origin - scale: $scale');
+        final positionInShapeCoordinates = (details.localPosition / scale -
+            origin * scale -
+            center * (1 - scale) / scale);
 
+        // print('origin: $origin - scale: $scale');
+        // print(selectedShape);
         if (selectedShape != null) {
           setState(() {
             moveShape(positionInShapeCoordinates);
@@ -189,29 +209,34 @@ class _CoordinateSystemState extends State<CoordinateSystem> {
         }
       },
       onLongPressEnd: (details) {
-        print('long press end');
+        // print('long press end');
 
         deselectShape();
       },
       onScaleStart: (details) {
+        debugPrint('scale start');
         baseScale = scale;
-        lastFocalPoint = details.focalPoint;
+        lastFocalPoint = details.localFocalPoint;
+        // print(details.localFocalPoint);
       },
       onScaleUpdate: (details) {
+        debugPrint('scale update');
         setState(() {
           // Calculate the new scale based on the initial scale and the scale of the gesture
           scale = (baseScale * details.scale).clamp(minScale, maxScale);
+          // print(
+          //     'scale: $scale - baseScale: $baseScale - details.scale: ${details.scale}');
 
           // Calculate the new origin based on the initial focal point, the current focal point, and the new scale
-          final offset = details.focalPoint - lastFocalPoint!;
+          final offset = details.localFocalPoint - lastFocalPoint!;
           origin += offset / scale;
 
           // Update the last focal point
-          lastFocalPoint = details.focalPoint;
+
+          lastFocalPoint = details.localFocalPoint;
 
           // Update the smallest subdivision based on the new scale
           smallestSubdivision = currentSubdivision;
-          // print(currentSubdivision);
         });
       },
       onScaleEnd: (details) {

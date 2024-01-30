@@ -5,6 +5,7 @@ class CoordinatePainter extends CustomPainter {
   final Offset origin;
   final double unit;
   final double scale;
+
   final List<Shape> shapes;
   final double smallestSubdivision;
 
@@ -22,8 +23,10 @@ class CoordinatePainter extends CustomPainter {
       ..color = Colors.black
       ..strokeWidth = 2;
 
-    final double centerX = (size.width / 2 + origin.dx) * scale;
-    final double centerY = (size.height / 2 + origin.dy) * scale;
+    final double centerX = (size.width / 2 + origin.dx * scale);
+    final double centerY = (size.height / 2 + origin.dy * scale);
+    // print('origin: $origin - scale: $scale');
+    // print('centerX: $centerX - centerY: $centerY');
 
     final textPainter = TextPainter(
       textDirection: TextDirection.ltr,
@@ -193,7 +196,7 @@ class CoordinatePainter extends CustomPainter {
     }
 
     // Draw shapes
-    drawShapes(canvas);
+    drawShapes(canvas, centerX, centerY);
   }
 
   void drawMainAxis({
@@ -275,24 +278,41 @@ class CoordinatePainter extends CustomPainter {
     );
   }
 
-  void drawShapes(Canvas canvas) {
+  void drawShapes(Canvas canvas, double centerX, double centerY) {
     for (var shape in shapes) {
       final paint = Paint()..color = shape.color;
 
-      final transformedOffset = (shape.offset! + origin) * scale;
+      final transformedOffset = (shape.offset! + origin * scale);
+
+      // print('shape.offset: ${shape.offset}');
+      // print('origin: $origin');
+      // print('scale: $scale');
+      // print('transformedOffset: $transformedOffset');
+      // print(
+      //     'distance: ${centerX - transformedOffset.dx} - ${centerY - transformedOffset.dy}');
+
+      final distance = Offset(centerX, centerY) - transformedOffset;
+
+      // print('distance: $distance');
+
+      // print(
+      //     'newTransformedOffset: ${Offset(centerX, centerY) - distance * scale}');
 
       if (shape.isRectangle) {
+        // print(
+        //     'shape.width: ${shape.width! * scale} - shape.height: ${shape.height! * scale}');
         canvas.drawRect(
           Rect.fromCenter(
-            center: transformedOffset,
+            center: Offset(centerX, centerY) - distance * scale,
             width: shape.width! * scale,
             height: shape.height! * scale,
           ),
           paint,
         );
       } else {
+        // print('shape.radius: ${shape.radius! * scale}');
         canvas.drawCircle(
-          transformedOffset,
+          Offset(centerX, centerY) - distance * scale,
           shape.radius! * scale,
           paint,
         );

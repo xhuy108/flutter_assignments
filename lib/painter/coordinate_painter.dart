@@ -46,6 +46,65 @@ class CoordinatePainter extends CustomPainter {
       ..color = Colors.grey
       ..strokeWidth = 1;
 
+    drawUnitLine(
+      canvas: canvas,
+      textPainter: textPainter,
+      subCoordinatePaint: subCoordinatePaint,
+      size: size,
+      centerX: centerX,
+      centerY: centerY,
+    );
+
+    // Draw shapes
+    drawShapes(canvas, centerX, centerY);
+  }
+
+  void drawMainAxis({
+    required Canvas canvas,
+    required Size size,
+    required double centerX,
+    required double centerY,
+    required TextPainter textPainter,
+    required Paint mainAxisPaint,
+  }) {
+    // Draw X and Y axes
+    canvas.drawLine(
+      Offset(0, centerY),
+      Offset(size.width, centerY),
+      mainAxisPaint,
+    );
+    canvas.drawLine(
+      Offset(centerX, 0),
+      Offset(centerX, size.height),
+      mainAxisPaint,
+    );
+
+    textPainter.text = const TextSpan(
+      text: 'O',
+      style: TextStyle(
+        color: Colors.black,
+        fontWeight: FontWeight.bold,
+        fontSize: 16,
+      ),
+    );
+    textPainter.layout();
+    textPainter.paint(
+      canvas,
+      Offset(
+        centerX - 16,
+        centerY + 5,
+      ),
+    );
+  }
+
+  void drawUnitLine({
+    required Canvas canvas,
+    required TextPainter textPainter,
+    required Paint subCoordinatePaint,
+    required Size size,
+    required double centerX,
+    required double centerY,
+  }) {
     final minX = ((0 - origin.dx) / (30 * scale)).floor() - size.width / 2;
     final maxX =
         ((size.width - origin.dx) / (30 * scale)).ceil() + size.width / 2;
@@ -194,88 +253,6 @@ class CoordinatePainter extends CustomPainter {
         ),
       );
     }
-
-    // Draw shapes
-    drawShapes(canvas, centerX, centerY);
-  }
-
-  void drawMainAxis({
-    required Canvas canvas,
-    required Size size,
-    required double centerX,
-    required double centerY,
-    required TextPainter textPainter,
-    required Paint mainAxisPaint,
-  }) {
-    // Draw X and Y axes
-    canvas.drawLine(
-      Offset(0, centerY),
-      Offset(size.width, centerY),
-      mainAxisPaint,
-    );
-    canvas.drawLine(
-      Offset(centerX, 0),
-      Offset(centerX, size.height),
-      mainAxisPaint,
-    );
-
-    textPainter.text = const TextSpan(
-      text: 'O',
-      style: TextStyle(
-        color: Colors.black,
-        fontWeight: FontWeight.bold,
-        fontSize: 16,
-      ),
-    );
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      Offset(
-        centerX - 16,
-        centerY + 5,
-      ),
-    );
-  }
-
-  void drawUnitLine({
-    required Canvas canvas,
-    required double value,
-    required TextPainter textPainter,
-    required Paint subCoordinatePaint,
-    required Offset textOffset,
-    required Offset miniSubLineStart,
-    required Offset miniSubLineEnd,
-    required Offset longSubLineStart,
-    required Offset longSubLineEnd,
-  }) {
-    canvas.drawLine(
-      miniSubLineStart,
-      miniSubLineEnd,
-      subCoordinatePaint,
-    );
-
-    String unitNum = '';
-
-    if (value.toStringAsFixed(1) == value.roundToDouble().toString()) {
-      canvas.drawLine(
-        longSubLineStart,
-        longSubLineEnd,
-        subCoordinatePaint,
-      );
-      unitNum = value.round().toString();
-    } else {
-      unitNum = value.toStringAsFixed(1);
-    }
-
-    textPainter.text = TextSpan(
-      text: unitNum,
-      style: const TextStyle(color: Colors.black),
-    );
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      textOffset,
-    );
   }
 
   void drawShapes(Canvas canvas, double centerX, double centerY) {

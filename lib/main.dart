@@ -214,13 +214,13 @@ class _CoordinateSystemState extends State<CoordinateSystem> {
         deselectShape();
       },
       onScaleStart: (details) {
-        debugPrint('scale start');
+        // debugPrint('scale start');
         baseScale = scale;
         lastFocalPoint = details.localFocalPoint;
         // print(details.localFocalPoint);
       },
       onScaleUpdate: (details) {
-        debugPrint('scale update');
+        // debugPrint('scale update');
         setState(() {
           // Calculate the new scale based on the initial scale and the scale of the gesture
           scale = (baseScale * details.scale).clamp(minScale, maxScale);
